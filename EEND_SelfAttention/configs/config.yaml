@@ -1,0 +1,19 @@
+train:
+    learning_rate: 0.001
+    epochs: 5
+    batch_size: 1
+    device: "cuda"
+
+audio:
+    sample_rate: 16000
+    num_mels: 64
+    frame_step: 160
+
+dataset:
+    path: "/home/kar/Projects/EEND_SelfAttention/EEND_SelfAttention/dataset"
+    num_speakers: 3
+    frame_duration: 0.01
+
+model:
+    hidden_dim: 128
+    num_heads: 4
