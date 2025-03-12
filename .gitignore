@@ -1,8 +1,11 @@
 # Train data
 *.wav
 *.rttm
+
 # model
 *.pth
+inference_plot.png
+training_loss.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
