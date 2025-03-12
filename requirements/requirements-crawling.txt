@@ -1,0 +1,9 @@
+# Terminal Color Formatting
+colorama
+
+# YouTube Video Downloading
+pytubefix
+yt-dlp
+
+# Audio Processing
+pydub

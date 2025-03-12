@@ -1,0 +1,24 @@
+# Core Dependencies
+torch
+torchaudio
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+tqdm
+pyyaml
+
+# Audio Processing
+librosa
+soundfile
+
+# Data Handling
+scikit-learn
+
+# Visualization
+jupyterlab
+ipython
+
+# Additional Utilities
+tensorboard
