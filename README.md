@@ -1,6 +1,7 @@
 # EEND_SelfAttention
 
-The implementation of the "End-to-End Neural Speaker Diarization with Self-Attention" paper.
+The implementation of the "End-to-End Neural Speaker Diarization with Self-Attention" paper.  
+[**Paper link**](https://arxiv.org/abs/1909.06247)
 
 ## Table of Contents
 
