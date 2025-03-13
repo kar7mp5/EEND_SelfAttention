@@ -2,6 +2,8 @@
 *.wav
 *.rttm
 
+info.txt
+
 # model
 *.pth
 inference_plot.png
