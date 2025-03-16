@@ -1,6 +1,7 @@
 # Train data
 *.wav
 *.rttm
+*.npy
 
 info.txt
 
