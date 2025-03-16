@@ -66,26 +66,30 @@ def infer(model, audio_path):
         audio_path (str): Path to the input audio file.
 
     Returns:
-        np.ndarray: Predicted speaker labels.
+        np.ndarray: Predicted speaker labels (binary).
         np.ndarray: Mel spectrogram for visualization.
+        np.ndarray: Raw speaker activation probabilities.
     """
     model.eval()
     features = extract_features(audio_path).unsqueeze(0).float()  # Add batch dimension
 
     with torch.no_grad():
         output = model(features)
+        speaker_probs = output.squeeze(0).numpy()  # Raw probabilities
 
-    predicted_labels = (output.squeeze(0) > 0.5).int().numpy()
-    return predicted_labels, features.squeeze(0).numpy()
+    predicted_labels = (speaker_probs > 0.5).astype(int)  # Apply threshold
 
-def save_diarization_results(audio_path, predictions, mel_spectrogram):
+    return predicted_labels, features.squeeze(0).numpy(), speaker_probs
+
+def save_diarization_results(audio_path, predictions, mel_spectrogram, speaker_probs):
     """
-    Saves the speaker diarization results to a text file and generates a visualization.
+    Saves the speaker diarization results to a text file and generates visualizations.
 
     Args:
         audio_path (str): Path to the input audio file.
-        predictions (np.ndarray): Predicted speaker labels.
+        predictions (np.ndarray): Predicted speaker labels (binary).
         mel_spectrogram (np.ndarray): Mel spectrogram for visualization.
+        speaker_probs (np.ndarray): Raw speaker probabilities from the model.
     """
     num_frames, num_speakers = predictions.shape
     frame_duration = config.get("dataset.frame_duration")
@@ -93,45 +97,55 @@ def save_diarization_results(audio_path, predictions, mel_spectrogram):
     y, sr = librosa.load(audio_path, sr=config.get("audio.sample_rate"))
     time_axis = np.linspace(0, len(y) / sr, num_frames)
 
-    # Save results to a text file
-    results_file = "inference_results.txt"
-    with open(results_file, "w") as f:
-        f.write("Time (s)," + ",".join([f"Speaker {i+1}" for i in range(num_speakers)]) + "\n")
-        for i, time in enumerate(time_axis):
-            speakers_active = ",".join(map(str, predictions[i]))
-            f.write(f"{time:.2f},{speakers_active}\n")
-
     # Generate and save the visualization
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(12, 10))
 
     # Display the Mel spectrogram
     plt.subplot(2, 1, 1)
     librosa.display.specshow(
         mel_spectrogram.T, sr=sr, hop_length=int(sr * frame_duration), x_axis="time", y_axis="mel"
     )
-    plt.colorbar(label="dB")
+    # plt.colorbar(label="dB")
     plt.title("Mel Spectrogram")
 
-    # Display the speaker diarization results
-    plt.subplot(2, 1, 2)
+    # # Display the speaker diarization results (binary predictions)
+    # plt.subplot(3, 1, 2)
     colors = ['b', 'orange', 'g', 'r', 'purple']
+    # detected_speakers = False  # Track if any speakers were detected
 
+    # for speaker in range(num_speakers):
+    #     active_frames = np.where(predictions[:, speaker] == 1)[0]
+    #     if len(active_frames) > 0:
+    #         detected_speakers = True
+    #         plt.scatter(time_axis[active_frames], np.full_like(active_frames, speaker),
+    #                     color=colors[speaker % len(colors)], label=f"Speaker {speaker+1}", alpha=0.7)
+
+    # plt.xlabel("Time (seconds)")
+    # plt.ylabel("Speaker ID")
+    # plt.title("Speaker Diarization Results")
+    # plt.yticks(range(num_speakers), [f"Speaker {i+1}" for i in range(num_speakers)])
+
+    # Add legend only if speakers were detected
+    # if detected_speakers:
+    #     plt.legend()
+
+    # Speaker probability plot (NEW FEATURE)
+    plt.subplot(2, 1, 2)
     for speaker in range(num_speakers):
-        active_frames = np.where(predictions[:, speaker] == 1)[0]
-        if len(active_frames) > 0:
-            plt.scatter(time_axis[active_frames], np.full_like(active_frames, speaker),
-                        color=colors[speaker % len(colors)], label=f"Speaker {speaker+1}", alpha=0.7)
+        plt.plot(time_axis, speaker_probs[:, speaker], color=colors[speaker % len(colors)], label=f"Speaker {speaker+1}")
 
     plt.xlabel("Time (seconds)")
-    plt.ylabel("Speaker ID")
-    plt.title("Speaker Diarization Results")
-    plt.yticks(range(num_speakers), [f"Speaker {i+1}" for i in range(num_speakers)])
+    plt.ylabel("Activation Probability")
+    plt.title("Speaker Activation Probabilities")
+    plt.ylim(0, 1)  # Probability range (0-1)
     plt.legend()
+
     plt.tight_layout()
     plt.savefig("inference_plot.png")
+    plt.show()
 
 # Run inference
-predictions, mel_spectrogram = infer(model, AUDIO_PATH)
+predictions, mel_spectrogram, speaker_probs = infer(model, AUDIO_PATH)
 
 # Save the results
-save_diarization_results(AUDIO_PATH, predictions, mel_spectrogram)
+save_diarization_results(AUDIO_PATH, predictions, mel_spectrogram, speaker_probs)
