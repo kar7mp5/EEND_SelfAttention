@@ -1,7 +1,7 @@
 train:
     learning_rate: 0.001
-    epochs: 5
-    batch_size: 1
+    epochs: 1
+    batch_size: 128
     device: "cuda"
 
 audio:
@@ -10,8 +10,8 @@ audio:
     frame_step: 160
 
 dataset:
-    path: "/home/kar/Projects/EEND_SelfAttention/EEND_SelfAttention/dataset"
-    num_speakers: 3
+    path: "/home/kar/Projects/EEND_SelfAttention/EEND_SelfAttention/data/merged_data"
+    num_speakers: 4
     frame_duration: 0.01
 
 model:

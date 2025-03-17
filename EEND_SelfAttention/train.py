@@ -15,7 +15,7 @@ BATCH_SIZE = config.get("train.batch_size")
 DEVICE = torch.device(config.get("train.device") if torch.cuda.is_available() else "cpu")
 
 # Ensure that the dataset directory exists
-DATA_DIR = os.path.abspath("./dataset/")
+DATA_DIR = config.get("dataset.path")
 if not os.path.exists(DATA_DIR):
     raise FileNotFoundError(f"Data folder '{DATA_DIR}' not found. Please check the path.")
 

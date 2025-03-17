@@ -142,7 +142,7 @@ def save_diarization_results(audio_path, predictions, mel_spectrogram, speaker_p
 
     plt.tight_layout()
     plt.savefig("inference_plot.png")
-    plt.show()
+    # plt.show()
 
 # Run inference
 predictions, mel_spectrogram, speaker_probs = infer(model, AUDIO_PATH)
